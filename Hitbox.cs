@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -18,7 +18,6 @@ public class Hitbox : MonoBehaviour, IDamageable
             HitboxName = value;
         }
     }
-
     public void TakeDamage(int Damage)
     {
         Parent.TakeDamage((int)((float)Damage * DamageMultiplier));
