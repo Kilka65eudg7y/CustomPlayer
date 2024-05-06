@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+
+public class Player : BaseEntity
 {
     public enum MovementState
     {
@@ -14,33 +15,38 @@ public class Player : MonoBehaviour
     }
 
     [Header("Movement")]
-    [SerializeField] private float WalkSpeed;
-    [SerializeField] private float RunSpeed;
-    [SerializeField] private float AccelerationSpeed;
+    [SerializeField] private float WalkSpeed = 5f;
+    [SerializeField] private float RunSpeed = 7f;
+    [SerializeField] private float AccelerationSpeed = 15f;
     private MovementState m_MovementState;
     private Vector3 MovementDirection;
     private float CurrentSpeed;
 
     [Header("Grounded")]
     [SerializeField] private Vector3 GroundCheckPosition;
-    [SerializeField] private float GroundCheckSize;
+    [SerializeField] private float GroundCheckSize = 1.1f;
     private bool IsGrounded;
 
     [Header("Camera")]
     [SerializeField] private Transform CameraTransform;
     [SerializeField] private Camera m_Camera;
-    [SerializeField] private float Sensivity;
-    [SerializeField] private float CameraSmoothness;
+    [SerializeField] private float Sensivity = 1f;
+    [SerializeField] private bool EnableCameraXClamp = false;
+    [SerializeField] private Vector2 CameraClampX;
+    [SerializeField] private bool EnableCameraYClamp = true;
+    [SerializeField] private Vector2 CameraClampY = new Vector2(-75, 75);
+    private float CameraX;
+    private float CameraY;
 
     [Header("Dynamic fov")]
-    [SerializeField] private float WalkFov;
-    [SerializeField] private float RunFov;
-    [SerializeField] private float DefaultFov;
-    [SerializeField] private float FovSmoothness;
+    [SerializeField] private float WalkFov = 65f;
+    [SerializeField] private float RunFov = 70f;
+    [SerializeField] private float DefaultFov = 60f;
+    [SerializeField] private float FovSmoothness = 15f;
 
     [Header("Head bob")]
     [SerializeField] private float WalkBobbingSpeed = 14f;
-    [SerializeField] private float RunBobbingSpeed = 14f;
+    [SerializeField] private float RunBobbingSpeed = 18f;
     [SerializeField] private float BobbingAmount = 0.05f;
     [SerializeField] private float HeadBobSmoothness = 0.01f;
     float DefaultCameraY = 0;
@@ -93,13 +99,22 @@ public class Player : MonoBehaviour
     }
     private void Look()
     {
-        Vector3 TransformVelocity = Vector3.zero;
-        float CameraVelocity = 0f; 
+        CameraX += Input.GetAxis("Mouse X") * Sensivity;
+        CameraY += Input.GetAxis("Mouse Y") * Sensivity;
 
-        Vector3 CameraAngles = CameraTransform.eulerAngles;
-        CameraAngles.x = Mathf.SmoothDamp(CameraAngles.x, CameraAngles.x + -Input.GetAxis("Mouse Y") * Sensivity, ref CameraVelocity, CameraSmoothness * Time.deltaTime);
-        CameraTransform.eulerAngles = CameraAngles;
-        transform.eulerAngles = Vector3.SmoothDamp(transform.eulerAngles, new Vector3(0f, Input.GetAxis("Mouse X") * Sensivity, 0f) + transform.eulerAngles, ref TransformVelocity, CameraSmoothness * Time.deltaTime);
+        if (EnableCameraXClamp)
+        {
+            CameraX = Mathf.Clamp(CameraX, CameraClampX.x, CameraClampX.y);
+        }
+        if(EnableCameraYClamp)
+        {
+            CameraY = Mathf.Clamp(CameraY, CameraClampY.x, CameraClampY.y);
+        }
+
+        CameraTransform.eulerAngles = new Vector3(
+            -CameraY,
+            transform.eulerAngles.y);
+        transform.eulerAngles = new Vector3(0f, CameraX, 0f);
     }
     private void Movement()
     {
@@ -121,20 +136,20 @@ public class Player : MonoBehaviour
             m_MovementState = MovementState.None;
         }
 
-        float Velocity = 0f;
+        float AccelerationVelocity = 0f;
         float FovVelocity = 0f;
         switch (m_MovementState)
         {
             case MovementState.None:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, 0f, ref Velocity, AccelerationSpeed * Time.deltaTime);
+                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, 0f, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
                 m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, DefaultFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
                 break;
             case MovementState.Walk:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, WalkSpeed, ref Velocity, AccelerationSpeed * Time.deltaTime);
+                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, WalkSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
                 m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, WalkFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
                 break;
             case MovementState.Run:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, RunSpeed, ref Velocity, AccelerationSpeed * Time.deltaTime);
+                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, RunSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
                 m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, RunFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
                 break;
         }
