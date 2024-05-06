@@ -17,6 +17,7 @@ public class Player : BaseEntity
     [Header("Movement")]
     [SerializeField] private float WalkSpeed = 5f;
     [SerializeField] private float RunSpeed = 7f;
+    [SerializeField] private float AirSpeed = 3f;
     [SerializeField] private float AccelerationSpeed = 15f;
     [SerializeField] private Rigidbody Rigidbody;
     [SerializeField] private float JumpForce = 4.5f;
@@ -43,6 +44,7 @@ public class Player : BaseEntity
     [Header("Dynamic fov")]
     [SerializeField] private float WalkFov = 65f;
     [SerializeField] private float RunFov = 70f;
+    [SerializeField] private float AirFov = 63f;
     [SerializeField] private float DefaultFov = 60f;
     [SerializeField] private float FovSmoothness = 15f;
 
@@ -146,6 +148,10 @@ public class Player : BaseEntity
         {
             m_MovementState = MovementState.Walk;
         }
+        else if(!IsGrounded)
+        {
+            m_MovementState = MovementState.Air;
+        }
         else
         {
             m_MovementState = MovementState.None;
@@ -166,6 +172,10 @@ public class Player : BaseEntity
             case MovementState.Run:
                 CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, RunSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
                 m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, RunFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
+                break;
+            case MovementState.Air:
+                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, AirSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
+                m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, AirFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
                 break;
         }
     }
