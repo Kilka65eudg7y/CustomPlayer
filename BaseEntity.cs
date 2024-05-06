@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 public class BaseEntity : MonoBehaviour
@@ -12,7 +13,8 @@ public class BaseEntity : MonoBehaviour
     public void TakeDamage(int Damage)
     {
         Health -= Damage;
-        if(Health <= 0)
+        Debug.Log(Health);
+        if (Health <= 0)
         {
             OnDead();
         }
@@ -29,7 +31,11 @@ public class BaseEntity : MonoBehaviour
         {
             hitbox.Parent = this;
         }
+        OnStart();
     }
-
+    public virtual void OnStart()
+    {
+        
+    }
     
 }
