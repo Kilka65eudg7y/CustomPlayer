@@ -18,6 +18,8 @@ public class Player : BaseEntity
     [SerializeField] private float WalkSpeed = 5f;
     [SerializeField] private float RunSpeed = 7f;
     [SerializeField] private float AccelerationSpeed = 15f;
+    [SerializeField] private Rigidbody Rigidbody;
+    [SerializeField] private float JumpForce = 4.5f;
     private MovementState m_MovementState;
     private Vector3 MovementDirection;
     private float CurrentSpeed;
@@ -55,11 +57,13 @@ public class Player : BaseEntity
     [Header("Other")]
     public bool CanMove;
     public bool CanLook;
+    public bool CanJump;
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         DefaultCameraY = CameraTransform.localPosition.y;
+        Rigidbody = GetComponent<Rigidbody>();  
     }
     private void Update()
     {
@@ -74,6 +78,10 @@ public class Player : BaseEntity
         if (CanLook)
         {
             Look();
+        }
+        if (CanJump && Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
         }
     }
     private void HeadBob()
@@ -106,7 +114,7 @@ public class Player : BaseEntity
         {
             CameraX = Mathf.Clamp(CameraX, CameraClampX.x, CameraClampX.y);
         }
-        if(EnableCameraYClamp)
+        if (EnableCameraYClamp)
         {
             CameraY = Mathf.Clamp(CameraY, CameraClampY.x, CameraClampY.y);
         }
@@ -118,8 +126,15 @@ public class Player : BaseEntity
     }
     private void Movement()
     {
-        MovementDirection = transform.TransformDirection(new Vector3(Input.GetAxis("Horizontal") * CurrentSpeed * Time.deltaTime, 0f, Input.GetAxis("Vertical") * CurrentSpeed * Time.deltaTime));
-        transform.position += MovementDirection;
+        MovementDirection = transform.TransformDirection(new Vector3(Input.GetAxis("Horizontal") * CurrentSpeed, 0f, Input.GetAxis("Vertical") * CurrentSpeed));
+        Rigidbody.velocity = new Vector3(MovementDirection.x, Rigidbody.velocity.y, MovementDirection.z);
+    }
+    private void Jump()
+    {
+        if(IsGrounded)
+        {
+            Rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
+        }
     }
     private void UpdateState()
     {
