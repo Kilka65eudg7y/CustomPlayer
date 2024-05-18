@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class Player : BaseEntity
 {
     public enum MovementState
@@ -171,21 +170,22 @@ public class Player : BaseEntity
         switch (m_MovementState)
         {
             case MovementState.None:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, 0f, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
-                m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, DefaultFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
+                UpdateValues(0f, DefaultFov, ref FovVelocity, ref AccelerationVelocity);
                 break;
             case MovementState.Walk:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, WalkSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
-                m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, WalkFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
+                UpdateValues(WalkSpeed, WalkFov, ref FovVelocity, ref AccelerationVelocity);
                 break;
             case MovementState.Run:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, RunSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
-                m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, RunFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
+                UpdateValues(RunSpeed, RunFov, ref FovVelocity, ref AccelerationVelocity);
                 break;
             case MovementState.Air:
-                CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, AirSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
-                m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, AirFov, ref FovVelocity, FovSmoothness * Time.deltaTime);
+                UpdateValues(AirSpeed, AirFov, ref FovVelocity, ref AccelerationVelocity);
                 break;
         }
+    }
+    private void UpdateValues(float MovementSpeed, float Fov, ref float FovVelocity, ref float AccelerationVelocity)
+    {
+        CurrentSpeed = Mathf.SmoothDamp(CurrentSpeed, MovementSpeed, ref AccelerationVelocity, AccelerationSpeed * Time.deltaTime);
+        m_Camera.fieldOfView = Mathf.SmoothDamp(m_Camera.fieldOfView, Fov, ref FovVelocity, FovSmoothness * Time.deltaTime);
     }
 }
