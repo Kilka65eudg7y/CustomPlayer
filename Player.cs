@@ -37,7 +37,7 @@ public class Player : BaseEntity
     [SerializeField] private bool EnableCameraXClamp = false;
     [SerializeField] private Vector2 CameraClampX;
     [SerializeField] private bool EnableCameraYClamp = true;
-    [SerializeField] private Vector2 CameraClampY = new Vector2(-75, 75);
+    [SerializeField] private Vector2 CameraClampY = new Vector2(-85, 85);
     private float CameraX;
     private float CameraY;
 
@@ -61,11 +61,20 @@ public class Player : BaseEntity
     public bool CanLook;
     public bool CanJump;
 
+    public Vector2 GetLook()
+    {
+        return new Vector2(CameraX, CameraY);
+    }
+    public void AddRotation(Vector2 rotation)
+    {
+        CameraX += rotation.x;
+        CameraY += rotation.y;
+    }
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         DefaultCameraY = CameraTransform.localPosition.y;
-        Rigidbody = GetComponent<Rigidbody>();  
+        Rigidbody = GetComponent<Rigidbody>();
     }
     private void Update()
     {
@@ -133,7 +142,7 @@ public class Player : BaseEntity
     }
     private void Jump()
     {
-        if(IsGrounded)
+        if (IsGrounded)
         {
             Rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
         }
@@ -148,7 +157,7 @@ public class Player : BaseEntity
         {
             m_MovementState = MovementState.Walk;
         }
-        else if(!IsGrounded)
+        else if (!IsGrounded)
         {
             m_MovementState = MovementState.Air;
         }
