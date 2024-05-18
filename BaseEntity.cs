@@ -8,7 +8,6 @@ public class BaseEntity : MonoBehaviour
     [SerializeField] private List<Hitbox> Hitboxes;
     [SerializeField] private int MaxHealth;
     private int Health;
-
     
     public void TakeDamage(int Damage)
     {
@@ -33,6 +32,7 @@ public class BaseEntity : MonoBehaviour
         }
         OnStart();
     }
+    
     public virtual void OnStart()
     {
         
