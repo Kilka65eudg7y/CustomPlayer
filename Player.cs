@@ -48,8 +48,8 @@ public class Player : BaseEntity
     [SerializeField] private float FovSmoothness = 15f;
 
     [Header("Head bob")]
-    [SerializeField] private float WalkBobbingSpeed = 14f;
-    [SerializeField] private float RunBobbingSpeed = 18f;
+    [SerializeField] private float WalkBobbingSpeed = 11.5f;
+    [SerializeField] private float RunBobbingSpeed = 14f;
     [SerializeField] private float BobbingAmount = 0.05f;
     [SerializeField] private float HeadBobSmoothness = 0.01f;
     float DefaultCameraY = 0;
